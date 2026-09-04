@@ -1,0 +1,52 @@
+export const TRANSLATIONS: Record<string, { en: string; hi: string }> = {
+  // App Titles & Brand
+  appName: { en: 'BHOOMISETU', hi: 'भूमिसेतु' },
+  subTitle: { en: 'National Land Acquisition & Management System', hi: 'राष्ट्रीय भूमि अधिग्रहण एवं प्रबंधन प्रणाली' },
+  govIndia: { en: 'Government of India', hi: 'भारत सरकार' },
+  ministryName: { en: 'Ministry of Rural Development & MoRTH', hi: 'ग्रामीण विकास एवं सड़क परिवहन मंत्रालय' },
+  demoDataLabel: { en: 'Demo Data — Not Official Government Data', hi: 'नमूना डेटा — आधिकारिक सरकारी डेटा नहीं' },
+
+  // Navigation Items
+  dashboard: { en: '1. National Dashboard', hi: '1. राष्ट्रीय डैशबोर्ड' },
+  projects: { en: '2. Infrastructure Projects', hi: '2. अवसंरचना परियोजनाएं' },
+  parcels: { en: '3. Land Parcel Cadastre', hi: '3. भूखंड पंजीका' },
+  gisMap: { en: '4. GIS Cadastral Map', hi: '4. जीआईएस भू-मानचित्र' },
+  'gis-map': { en: '4. GIS Cadastral Map', hi: '4. जीआईएस भू-मानचित्र' },
+  workflow: { en: '5. Acquisition Lifecycle', hi: '5. अधिग्रहण जीवनचक्र' },
+  notifications: { en: '6. Statutory Notifications', hi: '6. वैधानिक अधिसूचनाएं' },
+  objections: { en: '7. Claims & Objections', hi: '7. दावे एवं आपत्तियां' },
+  awards: { en: '8. Awards & Valuation', hi: '8. पंचाट एवं मूल्यांकन' },
+  compensation: { en: '9. Compensation & DBT', hi: '9. मुआवजा एवं डीबीटी' },
+  families: { en: '10. Affected Families (SIA)', hi: '10. प्रभावित परिवार (एसआईए)' },
+  randr: { en: '11. Resettlement & Rehab', hi: '11. पुनर्वास एवं पुनर्स्थापन' },
+  possession: { en: '12. Physical Possession', hi: '12. भौतिक कब्जा' },
+  documents: { en: '13. Document Repository', hi: '13. दस्तावेज भंडार (DMS)' },
+  analytics: { en: '14. Delay & Risk Analytics', hi: '14. विलंब एवं जोखिम विश्लेषण' },
+  reports: { en: '15. Reports & MIS Generator', hi: '15. रिपोर्ट एवं एमआईएस जनरेटर' },
+  alerts: { en: '16. Alerts & Action Center', hi: '16. सतर्कता एवं कार्य केंद्र' },
+  audit: { en: '17. Statutory Audit Trail', hi: '17. वैधानिक ऑडिट ट्रेल' },
+  admin: { en: '18. Administration & APIs', hi: '18. प्रशासन एवं एपीआई' },
+  fieldOfficer: { en: 'Mobile Field Officer Mode', hi: 'मोबाइल फील्ड अधिकारी मोड' },
+  'field-verification': { en: 'Mobile Field Officer Mode', hi: 'मोबाइल फील्ड अधिकारी मोड' },
+
+  // Metrics & Headers
+  totalProjects: { en: 'Total Projects', hi: 'कुल परियोजनाएं' },
+  landRequired: { en: 'Land Required', hi: 'आवश्यक भूमि' },
+  landAcquired: { en: 'Land Acquired', hi: 'अधिग्रहित भूमि' },
+  pendingVerification: { en: 'Pending Verification', hi: 'सत्यापन लंबित' },
+  compDisbursed: { en: 'Comp. Disbursed', hi: 'वितरित मुआवजा' },
+  familiesRehab: { en: 'Families Rehab', hi: 'पुनर्वासित परिवार' },
+  possessionExecuted: { en: 'Possession Executed', hi: 'कब्जा संपन्न' },
+  delayedAtRisk: { en: 'Delayed / At Risk', hi: 'विलंबित / जोखिम में' },
+
+  // Buttons & Common Actions
+  searchPlaceholder: { en: 'Search records by keyword, ID, or survey number...', hi: 'कीवर्ड, आईडी या खसरा संख्या द्वारा खोजें...' },
+  exportCsv: { en: 'Export CSV', hi: 'सीएसवी निर्यात' },
+  printReport: { en: 'Print Report', hi: 'रिपोर्ट प्रिंट करें' },
+  filter: { en: 'Filters', hi: 'फ़िल्टर' },
+  save: { en: 'Save', hi: 'सहेजें' },
+  cancel: { en: 'Cancel', hi: 'रद्द करें' },
+  close: { en: 'Close', hi: 'बंद करें' },
+  submit: { en: 'Submit', hi: 'जमा करें' },
+  approve: { en: 'Approve', hi: 'स्वीकृत करें' },
+};
