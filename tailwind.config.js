@@ -58,14 +58,11 @@ export default {
       },
       fontFamily: {
         sans: [
-          'Inter',
-          '-apple-system',
-          'BlinkMacSystemFont',
           '"Segoe UI"',
-          'Roboto',
-          'Oxygen',
-          'Ubuntu',
-          'Cantarell',
+          'system-ui',
+          '-apple-system',
+          'Arial',
+          '"Noto Sans"',
           'sans-serif'
         ],
         serif: [

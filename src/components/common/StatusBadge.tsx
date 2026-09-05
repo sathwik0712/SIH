@@ -1,100 +1,93 @@
 import React from 'react';
-import { 
-  CheckCircle2, Clock, AlertTriangle, AlertCircle, 
-  ShieldCheck, HelpCircle, FileCheck, DollarSign, Home 
-} from 'lucide-react';
+import { CheckCircle2, Clock, AlertTriangle, XCircle, ShieldAlert, ArrowRightCircle } from 'lucide-react';
 
 interface StatusBadgeProps {
   status: string;
-  size?: 'sm' | 'md';
+  className?: string;
 }
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' }) => {
-  let bgClass = 'bg-gov-gray-100 text-gov-gray-700 border-gov-gray-300';
-  let Icon = HelpCircle;
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className = '' }) => {
+  const normalized = (status || '').toUpperCase();
 
-  switch (status) {
-    // Verification / Possession / Completed
-    case 'Verified':
-    case 'Completed':
-    case 'Possession Taken':
-    case 'Possession Completed':
-    case 'On Track':
-    case 'Paid':
-    case 'Clear Title':
-    case 'Relocation Completed':
-    case 'Approved by Collector':
-    case 'Approved':
-    case 'Finalized':
-    case 'Verified Official':
-    case 'Connected (Simulated API)':
-    case 'Healthy':
-      bgClass = 'bg-emerald-50 text-emerald-800 border-emerald-300';
-      Icon = CheckCircle2;
+  let config = {
+    label: status || 'Unknown',
+    bg: 'bg-slate-100',
+    text: 'text-slate-800',
+    border: 'border-slate-300',
+    icon: Clock,
+  };
+
+  switch (normalized) {
+    // Green: Completed, Approved, Verified, Possession Taken, Disbursed, On Track
+    case 'ON_TRACK':
+      config = { label: 'On Track', bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300', icon: CheckCircle2 };
+      break;
+    case 'COMPLETED':
+      config = { label: 'Completed', bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300', icon: CheckCircle2 };
+      break;
+    case 'APPROVED':
+      config = { label: 'Approved', bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300', icon: CheckCircle2 };
+      break;
+    case 'VERIFIED':
+      config = { label: 'Verified', bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300', icon: CheckCircle2 };
+      break;
+    case 'DISBURSED':
+      config = { label: 'Disbursed', bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300', icon: CheckCircle2 };
+      break;
+    case 'POSSESSION_TAKEN':
+      config = { label: 'Possession Taken', bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300', icon: CheckCircle2 };
       break;
 
-    // In Progress / Hearing / Pending
-    case 'In Progress':
-    case 'Under Verification':
-    case 'Hearing Scheduled':
-    case 'Hearing Period Open':
-    case 'Recommended by CALA':
-    case 'Pending Approval':
-    case 'Under PFMS Verification':
-    case 'Pending Land Allotment':
-    case 'Allotted':
-    case 'Sanctioned':
-    case 'Drafted':
-    case 'Draft Pending Review':
-    case 'Published':
-    case 'Notified (Sec 11)':
-    case 'Award Declared':
-    case 'Assessed':
-    case 'Identified':
-      bgClass = 'bg-amber-50 text-amber-900 border-amber-300';
-      Icon = Clock;
+    // Amber: Pending, At Risk, Under Verification, Field Visit, Notified
+    case 'AT_RISK':
+      config = { label: 'At Risk', bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-300', icon: AlertTriangle };
+      break;
+    case 'PENDING':
+      config = { label: 'Pending', bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-300', icon: Clock };
+      break;
+    case 'FIELD_VISIT_SCHEDULED':
+      config = { label: 'Field Visit Scheduled', bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-300', icon: ArrowRightCircle };
+      break;
+    case 'NOTIFIED':
+      config = { label: 'Notified (Sec 11)', bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-300', icon: Clock };
+      break;
+    case 'AWARD_DECLARED':
+      config = { label: 'Award Declared', bg: 'bg-indigo-50', text: 'text-indigo-800', border: 'border-indigo-300', icon: CheckCircle2 };
+      break;
+    case 'COMPENSATION_PAID':
+      config = { label: 'Compensation Paid', bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300', icon: CheckCircle2 };
       break;
 
-    // At Risk / Partial / Warning
-    case 'At Risk':
-    case 'Partial Possession':
-    case 'Discrepancy Found':
-    case 'Tenancy / Lease':
-    case 'Inam / Trust':
-    case 'Degraded':
-      bgClass = 'bg-orange-50 text-orange-900 border-orange-300';
-      Icon = AlertTriangle;
+    // Red: Critical, Delayed, Disputed, Objection Raised, Rejected
+    case 'DELAYED':
+      config = { label: 'Delayed', bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-300', icon: ShieldAlert };
       break;
-
-    // Critical / Delayed / Disputed / Stayed
-    case 'Delayed':
-    case 'Disputed':
-    case 'Disputed Escrow':
-    case 'Stayed by Court':
-    case 'Lapsed':
-    case 'Critical':
-    case 'Offline':
-    case 'Law & Order Enforced':
-      bgClass = 'bg-red-50 text-red-900 border-red-300';
-      Icon = AlertCircle;
+    case 'DISPUTED':
+      config = { label: 'Disputed', bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-300', icon: AlertTriangle };
       break;
-
-    case 'Government':
-      bgClass = 'bg-blue-50 text-blue-900 border-blue-300';
-      Icon = ShieldCheck;
+    case 'OBJECTION_RAISED':
+      config = { label: 'Objection Raised (Sec 15)', bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-300', icon: AlertTriangle };
+      break;
+    case 'REJECTED':
+      config = { label: 'Rejected', bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-300', icon: XCircle };
+      break;
+    case 'CRITICAL':
+      config = { label: 'Critical', bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-300', icon: ShieldAlert };
       break;
 
     default:
-      bgClass = 'bg-slate-100 text-slate-800 border-slate-300';
-      Icon = HelpCircle;
+      config = { label: status, bg: 'bg-slate-50', text: 'text-slate-800', border: 'border-slate-300', icon: Clock };
+      break;
   }
 
-  const padding = size === 'sm' ? 'px-1.5 py-0.5 text-xs' : 'px-2.5 py-1 text-xs font-medium';
+  const IconComponent = config.icon;
 
   return (
-    <span className={`inline-flex items-center gap-1 rounded border ${bgClass} ${padding} tracking-tight select-none`}>
-      <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
-      <span>{status}</span>
+    <span
+      className={`inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-xs font-medium border ${config.bg} ${config.text} ${config.border} ${className}`}
+    >
+      <IconComponent className="w-3.5 h-3.5 shrink-0" />
+      <span>{config.label}</span>
     </span>
   );
 };

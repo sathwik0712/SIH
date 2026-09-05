@@ -1,97 +1,91 @@
 import React from 'react';
-import { AcquisitionStage } from '../../types';
-import { Check, Clock, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Check } from 'lucide-react';
 
-interface WorkflowTimelineProps {
-  currentStage: AcquisitionStage;
-  onSelectStage?: (stage: AcquisitionStage) => void;
-  activeSelectedStage?: AcquisitionStage;
+export interface WorkflowStage {
+  key: string;
+  name: string;
+  statutoryRef: string;
 }
 
-export const STAGES_CONFIG: { stage: AcquisitionStage; label: string; short: string; actRef: string }[] = [
-  { stage: 1, label: 'Proposal & SIA', short: '1. Proposal', actRef: 'Sec 4(1) SIA' },
-  { stage: 2, label: 'Land Identification', short: '2. Identification', actRef: 'Cadastral GIS' },
-  { stage: 3, label: 'Field Verification', short: '3. Verification', actRef: 'DGPS & RoR 7/12' },
-  { stage: 4, label: 'Statutory Notification', short: '4. Notification', actRef: 'Sec 11(1) Gazette' },
-  { stage: 5, label: 'Claims & Objections', short: '5. Objections', actRef: 'Sec 15 Hearings' },
-  { stage: 6, label: 'Statutory Award', short: '6. Award', actRef: 'Sec 23/30 Valuation' },
-  { stage: 7, label: 'Compensation & DBT', short: '7. Compensation', actRef: 'PFMS e-Kuber' },
-  { stage: 8, label: 'Resettlement & Rehab', short: '8. R&R', actRef: 'Sec 31 Entitlements' },
-  { stage: 9, label: 'Physical Possession', short: '9. Possession', actRef: 'Sec 16 Panchnama' },
-  { stage: 10, label: 'Project Closure', short: '10. Closure', actRef: 'Handover & Audit' },
+export const WORKFLOW_STAGES: WorkflowStage[] = [
+  { key: 'PROPOSAL', name: 'Proposal', statutoryRef: 'Sec 4 Requisition' },
+  { key: 'VERIFICATION', name: 'Field Survey', statutoryRef: 'Joint Measurement' },
+  { key: 'NOTIFICATION', name: 'Notification', statutoryRef: 'Sec 11(1) Gazette' },
+  { key: 'OBJECTION', name: 'Objections', statutoryRef: 'Sec 15 Hearing' },
+  { key: 'AWARD', name: 'Award Inquiry', statutoryRef: 'Sec 23/30 Award' },
+  { key: 'COMPENSATION', name: 'Compensation', statutoryRef: 'PFMS Disbursal' },
+  { key: 'RANDR', name: 'R&R Execution', statutoryRef: 'Sec 31 Benefits' },
+  { key: 'POSSESSION', name: 'Possession', statutoryRef: 'Sec 38 Handover' },
+  { key: 'COMPLETED', name: 'Closure', statutoryRef: 'Revenue Mutation' },
 ];
 
-export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({
-  currentStage,
-  onSelectStage,
-  activeSelectedStage,
-}) => {
+interface WorkflowTimelineProps {
+  currentStage: string;
+  className?: string;
+}
+
+export const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({ currentStage, className = '' }) => {
+  const currentIndex = WORKFLOW_STAGES.findIndex(
+    s => s.key.toUpperCase() === (currentStage || '').toUpperCase()
+  );
+
+  const activeIndex = currentIndex >= 0 ? currentIndex : 0;
+
   return (
-    <div className="bg-white border border-gov-gray-300 rounded p-4 shadow-sm select-none">
-      <div className="flex items-center justify-between mb-3 border-b border-gov-gray-200 pb-2">
-        <div>
-          <h4 className="text-xs font-bold text-gov-navy uppercase tracking-wider font-serif">
-            RFCTLARR Statutory Acquisition Lifecycle (10 Stages)
-          </h4>
-          <p className="text-[11px] text-gov-gray-600">
-            Interactive stage progression from initial SIA proposal to final possession & project closure
-          </p>
-        </div>
-        <div className="flex items-center gap-3 text-[11px]">
-          <span className="flex items-center gap-1 text-emerald-700 font-medium">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Completed
-          </span>
-          <span className="flex items-center gap-1 text-amber-700 font-medium">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span> Current Stage
-          </span>
-          <span className="flex items-center gap-1 text-gov-gray-400 font-medium">
-            <span className="w-2.5 h-2.5 rounded-full bg-gov-gray-300"></span> Upcoming
-          </span>
-        </div>
+    <div className={`w-full bg-white p-4 border border-slate-200 rounded ${className}`}>
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+          Statutory Land Acquisition Lifecycle (RFCTLARR Act, 2013)
+        </h4>
+        <span className="text-[11px] text-slate-500 font-mono">
+          Current Stage: <span className="font-semibold text-gov-navy-800">{WORKFLOW_STAGES[activeIndex]?.name}</span>
+        </span>
       </div>
 
-      {/* Horizontal Steps Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-1.5 pt-1">
-        {STAGES_CONFIG.map((s) => {
-          const isPassed = s.stage < currentStage;
-          const isCurrent = s.stage === currentStage;
-          const isSelected = activeSelectedStage === s.stage;
+      <div className="overflow-x-auto pb-2">
+        <div className="flex items-center min-w-[720px] justify-between relative">
+          {/* Connecting Line */}
+          <div className="absolute top-4 left-6 right-6 h-0.5 bg-slate-200 -z-0" />
+          <div
+            className="absolute top-4 left-6 h-0.5 bg-gov-navy-800 -z-0 transition-all duration-300"
+            style={{ width: `${(activeIndex / (WORKFLOW_STAGES.length - 1)) * 90}%` }}
+          />
 
-          let stepBg = 'bg-gov-gray-100 text-gov-gray-600 border-gov-gray-200';
-          let icon = <span className="text-[10px] font-bold">{s.stage}</span>;
+          {WORKFLOW_STAGES.map((stage, idx) => {
+            const isCompleted = idx < activeIndex;
+            const isCurrent = idx === activeIndex;
 
-          if (isPassed) {
-            stepBg = 'bg-emerald-50 text-emerald-900 border-emerald-300';
-            icon = <Check className="w-3 h-3 text-emerald-700" />;
-          } else if (isCurrent) {
-            stepBg = 'bg-amber-100 text-amber-950 border-amber-400 ring-2 ring-amber-300/60 font-semibold';
-            icon = <Clock className="w-3 h-3 text-amber-800" />;
-          }
-
-          if (isSelected) {
-            stepBg += ' ring-2 ring-gov-navy';
-          }
-
-          return (
-            <button
-              key={s.stage}
-              onClick={() => onSelectStage && onSelectStage(s.stage)}
-              className={`p-2 rounded border text-left flex flex-col justify-between transition-all hover:shadow-xs ${stepBg} ${
-                onSelectStage ? 'cursor-pointer hover:border-gov-navy' : 'cursor-default'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="w-4 h-4 rounded-full bg-white/90 border border-current flex items-center justify-center flex-shrink-0">
-                  {icon}
+            return (
+              <div key={stage.key} className="flex flex-col items-center relative z-10 text-center px-1">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all border-2 ${
+                    isCompleted
+                      ? 'bg-gov-navy-800 text-white border-gov-navy-800'
+                      : isCurrent
+                      ? 'bg-amber-500 text-slate-900 border-amber-600 ring-4 ring-amber-100'
+                      : 'bg-white text-slate-400 border-slate-300'
+                  }`}
+                >
+                  {isCompleted ? <Check className="w-4 h-4" /> : idx + 1}
+                </div>
+                <span
+                  className={`text-xs mt-2 font-medium ${
+                    isCurrent
+                      ? 'text-gov-navy-900 font-bold'
+                      : isCompleted
+                      ? 'text-slate-700'
+                      : 'text-slate-400'
+                  }`}
+                >
+                  {stage.name}
                 </span>
-                <span className="text-[9px] font-mono text-gov-gray-500">{s.actRef}</span>
+                <span className="text-[10px] text-slate-500 font-mono scale-90">
+                  {stage.statutoryRef}
+                </span>
               </div>
-              <div className="text-[11px] font-bold leading-tight line-clamp-2">
-                {s.label}
-              </div>
-            </button>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -3,68 +3,29 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --gov-primary: #0B2265;
-    --gov-secondary: #1B365D;
-    --gov-accent: #D97706;
-    --gov-success: #15803D;
-    --gov-warning: #B45309;
-    --gov-danger: #B91C1C;
-  }
-
   body {
-    @apply bg-gov-gray-50 text-gov-gray-900;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    @apply bg-slate-50 text-slate-900 antialiased text-sm;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  /* High contrast mode */
-  body.high-contrast {
-    @apply bg-black text-white;
-  }
-  body.high-contrast * {
-    border-color: #ffffff !important;
-  }
-  body.high-contrast .bg-white,
-  body.high-contrast .bg-gov-gray-50,
-  body.high-contrast .bg-gov-gray-100 {
-    background-color: #000000 !important;
-    color: #ffffff !important;
+  /* Dense tabular layout styles */
+  th {
+    @apply font-semibold text-slate-700 bg-slate-100 text-xs tracking-wider uppercase;
   }
 }
 
-/* Custom crisp scrollbar for dense tables */
+/* Custom NIC scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #94a3b8;
   border-radius: 3px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Print styles for official government reports */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-  .print-only {
-    display: block !important;
-  }
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-  .gov-card {
-    border: 1px solid #000000 !important;
-    box-shadow: none !important;
-  }
+  background: #64748b;
 }
