@@ -26,4 +26,14 @@ public class LandParcelController {
         }
         return ResponseEntity.ok(ApiResponse.ok(landParcelService.getAllParcels()));
     }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<LandParcel>> createParcel(@RequestBody LandParcel parcel) {
+        return ResponseEntity.ok(ApiResponse.ok(landParcelService.createParcel(parcel, "API_USER", "SYSTEM")));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<LandParcel>> updateParcel(@PathVariable Long id, @RequestBody LandParcel parcel) {
+        return ResponseEntity.ok(ApiResponse.ok(landParcelService.updateParcel(id, parcel, "API_USER", "SYSTEM")));
+    }
 }

@@ -1,9 +1,13 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Bell, LogOut, Globe, Shield, ExternalLink } from 'lucide-react';
+import { Bell, LogOut, Globe, Shield, ExternalLink, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export const GovernmentHeader: React.FC = () => {
+interface Props {
+  children?: React.ReactNode;
+}
+
+export const GovernmentHeader: React.FC<Props> = ({ children }) => {
   const { user, logout } = useAuth();
 
   const getRoleBadgeStyle = (role?: string) => {
@@ -73,6 +77,18 @@ export const GovernmentHeader: React.FC = () => {
         {/* User Info and Quick Actions */}
         {user ? (
           <div className="flex items-center space-x-4">
+            {children}
+            <div className="hidden lg:flex items-center mx-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Global Search (Parcels, Projects)..."
+                  className="w-64 pl-8 pr-3 py-1.5 bg-[#071E3D] border border-white/20 rounded text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all shadow-inner"
+                />
+              </div>
+            </div>
+
             <Link
               to="/alerts"
               id="header-alerts-btn"

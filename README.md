@@ -1,32 +1,46 @@
-# React + TypeScript + Vite
+# BHOOMISETU: National Land Acquisition & Resettlement Portal
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+BHOOMISETU is a unified digital ecosystem designed to streamline, track, and audit land acquisition projects across India in compliance with the **Right to Fair Compensation and Transparency in Land Acquisition, Rehabilitation and Resettlement (RFCTLARR) Act, 2013**.
 
-Currently, two official plugins are available:
+## Features for SIH 2026 Presentation
+- **Statutory Workflow Tracking:** Strict adherence to Sec 4 through Sec 38 stages.
+- **Live GIS Mapping:** Cadastral overlays for precise field verification.
+- **Tamper-Evident Audit Trails:** Every action is logged immutably.
+- **Automated Gazette Generation:** One-click PDF generation of Section 11 notices.
+- **Citizen Portal:** Transparent grievance filing and compensation tracking.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
+- **Frontend:** React 18, TypeScript, Vite, TailwindCSS, Lucide Icons, Leaflet (GIS), jsPDF (Gazettes).
+- **Backend:** Spring Boot 3 (Java 17), Spring Data JPA, H2 In-Memory Database (for seamless demoing), SpringDoc (Swagger UI).
 
-## React Compiler
+## How to Run Locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+### 1. Start the Backend
+The backend runs an in-memory H2 database which seeds itself automatically on startup.
+```bash
+cd backend
+./mvnw clean spring-boot:run
 ```
+- API runs on `http://localhost:8080`
+- Swagger UI available at `http://localhost:8080/swagger-ui.html`
+- H2 Console available at `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:bhoomisetu_db`)
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### 2. Start the Frontend
+In a new terminal window:
+```bash
+npm install
+npm run dev
+```
+- The frontend will be available at `http://localhost:5173`
+
+## Demo Login Credentials
+Use the following credentials to access different role-based views during the demo:
+
+| Role | Username | Password | Notes |
+|------|----------|----------|-------|
+| Central Ministry | `admin` | `admin123` | Full pan-India view |
+| Land Acquiring Authority (NHAI) | `cala_pune` | `pune123` | Can advance workflow & generate gazettes |
+| Field Officer | `field_officer` | `field123` | Can run GIS verifications |
+| Citizen | *Click Citizen Portal* | N/A | Masked PII, grievance filing |
+
+> **Note:** This is a prototype built for the Smart India Hackathon. The database resets upon restarting the Spring Boot server.

@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { apiFetch } from '../api/client';
 import { WorkflowTimeline } from '../components/common/WorkflowTimeline';
 import { StatusBadge } from '../components/common/StatusBadge';
-import { ArrowLeft, MapPin, Building2, Calendar, FileText } from 'lucide-react';
+import { ArrowLeft, MapPin, Building2, Calendar, FileText, Download } from 'lucide-react';
+import { jsPDF } from 'jspdf';
 
 export const ProjectDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -56,10 +57,43 @@ export const ProjectDetails: React.FC = () => {
     );
   }
 
+  const generateGazette = () => {
+    if (!project) return;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('GAZETTE OF INDIA - EXTRAORDINARY', 105, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('PART II—Section 3—Sub-section (ii)', 105, 28, { align: 'center' });
+    doc.setFontSize(14);
+    doc.text('MINISTRY OF ROAD TRANSPORT AND HIGHWAYS', 105, 40, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('NOTIFICATION', 105, 50, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.text(`New Delhi, the ${new Date().toLocaleDateString()}`, 150, 60);
+    
+    const text = `S.O. (E).— In exercise of the powers conferred by sub-section (1) of section 11 of the Right to Fair Compensation and Transparency in Land Acquisition, Rehabilitation and Resettlement Act, 2013 (30 of 2013), the Central Government hereby notifies that the land specified in the Schedule below is required for the public purpose, namely, for the development of ${project.projectName} in the State of ${project.state}, District ${project.district}.`;
+    
+    const splitText = doc.splitTextToSize(text, 170);
+    doc.text(splitText, 20, 75);
+    
+    doc.setFontSize(12);
+    doc.text('SCHEDULE', 105, 120, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.text(`Total Land Required: ${project.totalLandRequiredHectares} Hectares`, 20, 130);
+    doc.text(`Total Parcels: ${project.totalParcels}`, 20, 140);
+    doc.text(`Acquiring Authority: ${project.acquiringAuthority}`, 20, 150);
+    
+    doc.text('[Digitally Generated via BHOOMISETU]', 20, 270);
+    
+    doc.save(`Gazette_Sec11_${project.projectCode}.pdf`);
+  };
+
   return (
     <div className="space-y-4">
       {/* Top Breadcrumb & Back */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-between">
         <Link
           to="/projects"
           className="flex items-center space-x-1 text-xs text-slate-600 hover:text-gov-navy-800 font-medium"
@@ -67,6 +101,12 @@ export const ProjectDetails: React.FC = () => {
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Projects</span>
         </Link>
+        <button
+          onClick={generateGazette}
+          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-[#0B3559] text-white rounded hover:bg-[#071E3D] transition-colors"
+        >
+          <Download className="w-3.5 h-3.5" /> Generate Sec 11 Gazette
+        </button>
       </div>
 
       {/* Project Header Card */}
@@ -99,9 +139,37 @@ export const ProjectDetails: React.FC = () => {
           </div>
         </div>
 
-        {/* Workflow Timeline */}
+        {/* Workflow Timeline / Milestone Tracker */}
         <div className="mt-4">
-          <WorkflowTimeline currentStage={project.acquisitionStage} />
+          <div className="w-full bg-white p-4 border border-slate-200 rounded shadow-sm">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
+              Project Milestone Tracker (Statutory Timelines)
+            </h4>
+            <div className="flex flex-col space-y-3">
+              {[
+                { name: 'Proposal / Sec 4', target: '2 Months', actual: 'Completed', status: 'ON_TRACK', pct: '100%' },
+                { name: 'Field Survey', target: '1 Month', actual: 'Completed', status: 'ON_TRACK', pct: '100%' },
+                { name: 'Notification / Sec 11', target: '2 Months', actual: 'Completed', status: 'ON_TRACK', pct: '100%' },
+                { name: 'Objections / Sec 15', target: '2 Months', actual: 'Completed', status: 'ON_TRACK', pct: '100%' },
+                { name: 'Award / Sec 23', target: '6 Months', actual: 'In Progress', status: 'ON_TRACK', pct: '60%' },
+                { name: 'Compensation', target: '3 Months', actual: 'Pending', status: 'PENDING', pct: '0%' },
+                { name: 'R&R Execution', target: '6 Months', actual: 'Pending', status: 'PENDING', pct: '0%' },
+                { name: 'Possession / Sec 38', target: '1 Month', actual: 'Pending', status: 'PENDING', pct: '0%' },
+              ].map((stage, idx) => (
+                <div key={idx} className="flex items-center text-xs group">
+                  <div className="w-40 font-semibold text-slate-700 group-hover:text-gov-navy-800 transition-colors">{stage.name}</div>
+                  <div className="flex-1 flex items-center space-x-2">
+                    <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden flex border border-slate-200">
+                      <div className={`h-full transition-all duration-500 ${stage.status === 'ON_TRACK' ? 'bg-emerald-500' : stage.status === 'DELAYED' ? 'bg-red-500' : stage.status === 'PENDING' ? 'bg-slate-300' : 'bg-amber-500'}`} style={{ width: stage.pct }}></div>
+                    </div>
+                  </div>
+                  <div className="w-32 text-right text-[10px] text-slate-500 font-mono">
+                    Tgt: {stage.target} | Act: {stage.actual}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

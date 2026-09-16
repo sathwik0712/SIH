@@ -11,9 +11,13 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
   const token = localStorage.getItem('bhoomisetu_token');
 
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
     ...(options.headers || {}),
   };
+
+  // Only set Content-Type to application/json if we are not sending FormData
+  if (!(options.body instanceof FormData) && !headers.hasOwnProperty('Content-Type')) {
+    (headers as Record<string, string>)['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;

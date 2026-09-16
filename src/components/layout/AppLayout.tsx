@@ -1,13 +1,16 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { HelpCircle } from 'lucide-react';
 import { GovernmentHeader } from '../common/GovernmentHeader';
 import { Sidebar } from '../common/Sidebar';
 import { Breadcrumbs } from '../common/Breadcrumbs';
 import { GovernmentFooter } from '../common/GovernmentFooter';
+import { HelpModal } from '../common/HelpModal';
 
 export const AppLayout: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const [isHelpOpen, setIsHelpOpen] = React.useState(false);
 
   if (isLoading) {
     return (
@@ -26,7 +29,15 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
-      <GovernmentHeader />
+      <GovernmentHeader>
+        <button 
+          onClick={() => setIsHelpOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#0B3559] bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
+        >
+          <HelpCircle className="w-3.5 h-3.5" />
+          <span>About / Help</span>
+        </button>
+      </GovernmentHeader>
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 flex flex-col overflow-y-auto bg-slate-50 min-h-[calc(100vh-80px)]">
@@ -38,6 +49,8 @@ export const AppLayout: React.FC = () => {
           <GovernmentFooter />
         </main>
       </div>
+
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 };

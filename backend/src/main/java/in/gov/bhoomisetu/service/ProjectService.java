@@ -14,9 +14,11 @@ import java.util.stream.Collectors;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final AuditService auditService;
 
-    public ProjectService(ProjectRepository projectRepository) {
+    public ProjectService(ProjectRepository projectRepository, AuditService auditService) {
         this.projectRepository = projectRepository;
+        this.auditService = auditService;
     }
 
     public List<ProjectSummaryDTO> getAllProjects() {
@@ -28,6 +30,18 @@ public class ProjectService {
     public Project getProjectById(Long id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found with ID: " + id));
+    }
+
+    public Project createProject(Project project, String username, String role) {
+        if (project.getProjectCode() == null || project.getProjectCode().isEmpty()) {
+            project.setProjectCode("PROJ-" + System.currentTimeMillis());
+        }
+        if (project.getAcquisitionStage() == null) project.setAcquisitionStage("PROPOSAL");
+        if (project.getStatus() == null) project.setStatus("ON_TRACK");
+        
+        Project saved = projectRepository.save(project);
+        auditService.logAction(username, role, "CREATE_PROJECT", "LAND_ACQUISITION", saved.getProjectCode(), "NONE", saved.getAcquisitionStage(), "New project proposal submitted", "127.0.0.1");
+        return saved;
     }
 
     public ProjectSummaryDTO toSummaryDTO(Project p) {

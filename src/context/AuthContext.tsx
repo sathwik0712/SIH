@@ -34,7 +34,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     apiFetch<DemoUser[]>('/auth/demo-accounts')
       .then(res => {
         if (res.success && res.data) {
-          setDemoAccounts(res.data);
+          // Add a mock citizen account for the frontend demo
+          const citizenMock = {
+            username: 'citizen@nic.in',
+            fullName: 'Shri Tukaram S. Gaikwad',
+            roleName: 'Affected Person',
+            designation: 'Landowner',
+            state: 'Maharashtra',
+            district: 'Pune',
+            password: 'demo'
+          };
+          setDemoAccounts([...res.data, citizenMock]);
         }
       })
       .catch(err => console.warn('Could not load demo accounts:', err))
@@ -42,6 +52,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (username: string, password: string, captcha?: string) => {
+    if (username === 'citizen@nic.in') {
+      const mockUser = {
+        id: 999,
+        username: 'citizen@nic.in',
+        fullName: 'Shri Tukaram S. Gaikwad',
+        email: 'citizen@nic.in',
+        role: 'CITIZEN' as any,
+        roleDisplayName: 'Affected Person',
+        designation: 'Landowner',
+        department: 'Citizen Portal',
+        state: 'Maharashtra',
+        district: 'Pune',
+        acquiringAuthority: 'N/A'
+      };
+      setToken('mock-citizen-token');
+      setUser(mockUser);
+      setPermissions([]);
+      localStorage.setItem('bhoomisetu_token', 'mock-citizen-token');
+      localStorage.setItem('bhoomisetu_user', JSON.stringify(mockUser));
+      return;
+    }
+
     const res = await apiFetch<{ token: string; user: User; permissions: string[] }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password, captcha }),

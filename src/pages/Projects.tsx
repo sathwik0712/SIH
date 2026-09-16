@@ -10,8 +10,19 @@ import { ExternalLink, Plus } from 'lucide-react';
 export const Projects: React.FC = () => {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    projectCode: '',
+    projectName: '',
+    state: '',
+    district: '',
+    acquiringAuthority: '',
+    totalLandRequiredHectares: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
+  const fetchProjects = () => {
+    setIsLoading(true);
     apiFetch<ProjectSummary[]>('/projects')
       .then(res => {
         if (res.success && res.data) {
@@ -20,7 +31,30 @@ export const Projects: React.FC = () => {
       })
       .catch(err => console.error('Failed to load projects:', err))
       .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    fetchProjects();
   }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    apiFetch('/projects', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...formData,
+        totalLandRequiredHectares: parseFloat(formData.totalLandRequiredHectares) || 0
+      })
+    })
+      .then(() => {
+        setShowModal(false);
+        setFormData({ projectCode: '', projectName: '', state: '', district: '', acquiringAuthority: '', totalLandRequiredHectares: '' });
+        fetchProjects();
+      })
+      .catch(err => console.error('Submit failed', err))
+      .finally(() => setIsSubmitting(false));
+  };
 
   const columns: Column<ProjectSummary>[] = [
     {
@@ -128,7 +162,7 @@ export const Projects: React.FC = () => {
           </p>
         </div>
         <button
-          onClick={() => alert('Add Project Requisition modal will be available in Phase 1.')}
+          onClick={() => setShowModal(true)}
           className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-semibold shadow-sm transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
@@ -144,6 +178,48 @@ export const Projects: React.FC = () => {
         searchPlaceholder="Search project by code, name, state, or authority..."
         searchField={p => `${p.projectCode} ${p.projectName} ${p.state} ${p.district} ${p.acquiringAuthority}`}
       />
+
+      {showModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
+            <h3 className="text-lg font-bold text-[#0B3559] mb-4">New Project Requisition (Sec 4)</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Project Code</label>
+                  <input required value={formData.projectCode} onChange={e => setFormData({...formData, projectCode: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-[#0B3559]" placeholder="e.g. NH-01" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Acquiring Authority</label>
+                  <input required value={formData.acquiringAuthority} onChange={e => setFormData({...formData, acquiringAuthority: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-[#0B3559]" placeholder="e.g. NHAI" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Project Name</label>
+                <input required value={formData.projectName} onChange={e => setFormData({...formData, projectName: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-[#0B3559]" placeholder="e.g. Highway Expansion Phase 1" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">State</label>
+                  <input required value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-[#0B3559]" placeholder="State" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">District</label>
+                  <input required value={formData.district} onChange={e => setFormData({...formData, district: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-[#0B3559]" placeholder="District" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Total Land Required (Hectares)</label>
+                <input type="number" step="0.01" required value={formData.totalLandRequiredHectares} onChange={e => setFormData({...formData, totalLandRequiredHectares: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-[#0B3559]" placeholder="0.00" />
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-200">
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-[#0B3559] hover:bg-[#071E3D] text-white rounded text-xs font-semibold shadow-sm">{isSubmitting ? 'Submitting...' : 'Submit Proposal'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

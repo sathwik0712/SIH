@@ -19,7 +19,12 @@ import {
   AlertTriangle,
   History,
   Settings,
-  Smartphone
+  Smartphone,
+  ClipboardList,
+  Briefcase,
+  Gavel,
+  ShieldCheck,
+  MessageSquareWarning
 } from 'lucide-react';
 
 interface NavItem {
@@ -37,10 +42,12 @@ const navItems: NavItem[] = [
   { name: 'Alerts & Escalations', path: '/alerts', icon: AlertTriangle, section: 'Overview' },
 
   // Land Acquisition & Projects
-  { name: 'Project Register', path: '/projects', icon: FolderGit2, section: 'Land Acquisition' },
+  { name: 'Project Register', path: '/projects', icon: ClipboardList, section: 'Land Acquisition' },
   { name: 'Land Parcels (Cadastral)', path: '/parcels', icon: MapPin, section: 'Land Acquisition' },
-  { name: 'Acquisition Workflow', path: '/workflow', icon: GitMerge, section: 'Land Acquisition' },
   { name: 'GIS Spatial Map', path: '/gis-map', icon: Map, section: 'Land Acquisition' },
+  { name: 'SIA Module', path: '/sia', icon: Users, section: 'Land Acquisition' },
+  { name: 'Acquisition Workflow', path: '/workflow', icon: Briefcase, section: 'Land Acquisition' },
+  { name: 'Sec 15 Hearings', path: '/hearings', icon: Gavel, section: 'Land Acquisition' },
   { name: 'Mobile Field Survey', path: '/field-verification', icon: Smartphone, section: 'Land Acquisition' },
 
   // Statutory & Awards
@@ -56,7 +63,8 @@ const navItems: NavItem[] = [
   // Compliance & MIS
   { name: 'Documents Repository', path: '/documents', icon: FileArchive, section: 'Compliance & MIS' },
   { name: 'MIS Reports & Exports', path: '/reports', icon: BarChart3, section: 'Compliance & MIS' },
-  { name: 'Audit Trail (Single Source)', path: '/audit-trail', icon: History, section: 'Compliance & MIS' },
+  { name: 'Audit Trail (Single Source)', path: '/audit-trail', icon: ShieldCheck, section: 'Compliance & MIS' },
+  { name: 'Grievances', path: '/grievances', icon: MessageSquareWarning, section: 'Compliance & MIS' },
   { name: 'System Administration', path: '/admin', icon: Settings, section: 'Compliance & MIS' },
 ];
 
@@ -67,7 +75,7 @@ export const Sidebar: React.FC = () => {
   const sections = Array.from(new Set(navItems.map(item => item.section)));
 
   return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 shrink-0 select-none min-h-[calc(100vh-80px)]">
+    <aside className="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-col border-r border-slate-800 shrink-0 select-none min-h-[calc(100vh-80px)]">
       <div className="p-3 bg-slate-950 border-b border-slate-800 text-[11px] text-slate-400 font-medium">
         <span className="text-slate-200">PORTAL NAVIGATION</span>
         <span className="block text-[10px] text-slate-500">RFCTLARR Standard Modules</span>

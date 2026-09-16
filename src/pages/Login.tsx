@@ -14,14 +14,21 @@ export const Login: React.FC = () => {
   const [captchaCode, setCaptchaCode] = useState('7K9P2');
   const [selectedRole, setSelectedRole] = useState('Central Ministry');
 
+  const [showDigiLocker, setShowDigiLocker] = useState(false);
+  const [digiLockerStep, setDigiLockerStep] = useState(0);
+
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      if (username === 'citizen@nic.in') {
+        navigate('/citizen', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, username]);
 
   const generateCaptcha = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -59,13 +66,28 @@ export const Login: React.FC = () => {
     setIsLoading(true);
     try {
       await login(username, password, captchaInput);
-      navigate('/dashboard');
+      if (username === 'citizen@nic.in') {
+        navigate('/citizen');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Invalid credentials. Please verify your official access.');
       generateCaptcha();
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDigiLocker = () => {
+    setShowDigiLocker(true);
+    setDigiLockerStep(1);
+    setTimeout(() => setDigiLockerStep(2), 1500);
+    setTimeout(() => {
+      setDigiLockerStep(3);
+      login('citizen@nic.in', 'demo', '7K9P2');
+      navigate('/citizen');
+    }, 3000);
   };
 
   return (
@@ -304,6 +326,25 @@ export const Login: React.FC = () => {
                   )}
                 </button>
               </form>
+
+              <div className="relative flex py-4 items-center">
+                <div className="flex-grow border-t border-slate-300"></div>
+                <span className="flex-shrink-0 mx-3 text-slate-400 text-[10px] uppercase tracking-wider font-bold">Or Landowner Login</span>
+                <div className="flex-grow border-t border-slate-300"></div>
+              </div>
+              
+              <button
+                type="button"
+                onClick={handleDigiLocker}
+                className="w-full bg-[#1A73E8] hover:bg-[#1557B0] text-white font-semibold py-2.5 px-4 rounded text-xs border border-[#1A73E8] transition-colors flex items-center justify-center space-x-2 shadow-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-[#1A73E8] font-bold text-[10px]">DL</span>
+                  </div>
+                  <span>Sign In with DigiLocker</span>
+                </div>
+              </button>
             </div>
 
             <div className="mt-6 pt-3 border-t border-slate-200 text-center text-[11px] text-slate-500">
@@ -317,6 +358,39 @@ export const Login: React.FC = () => {
       <footer className="bg-[#071E3D] text-slate-400 text-center py-2.5 px-4 text-[11px] border-t border-[#082541]">
         BHOOMISETU Portal • National Land Acquisition &amp; Resettlement Management System • Demo Prototype
       </footer>
+
+      {showDigiLocker && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 text-center border-t-4 border-[#1A73E8]">
+            <div className="w-16 h-16 bg-[#1A73E8]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#1A73E8]/20">
+              <span className="text-[#1A73E8] font-bold font-serif text-2xl">DL</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-800 mb-1">DigiLocker OAuth</h3>
+            
+            <div className="py-6 flex flex-col items-center">
+              {digiLockerStep === 1 && (
+                <>
+                  <div className="w-6 h-6 border-2 border-[#1A73E8] border-t-transparent rounded-full animate-spin mb-3" />
+                  <p className="text-xs text-slate-600 font-medium">Connecting to DigiLocker...</p>
+                </>
+              )}
+              {digiLockerStep === 2 && (
+                <>
+                  <div className="w-6 h-6 border-2 border-[#1A73E8] border-t-transparent rounded-full animate-spin mb-3" />
+                  <p className="text-xs text-slate-600 font-medium">Verifying Aadhaar & KYC credentials...</p>
+                </>
+              )}
+              {digiLockerStep === 3 && (
+                <>
+                  <CheckCircle2 className="w-8 h-8 text-emerald-500 mb-2 animate-bounce" />
+                  <p className="text-xs text-emerald-700 font-bold">Verified Successfully!</p>
+                  <p className="text-[10px] text-slate-500 mt-1">Redirecting to Citizen Portal...</p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

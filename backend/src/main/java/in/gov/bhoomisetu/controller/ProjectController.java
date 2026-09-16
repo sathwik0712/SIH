@@ -28,4 +28,10 @@ public class ProjectController {
     public ResponseEntity<ApiResponse<Project>> getProjectById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(projectService.getProjectById(id)));
     }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Project>> createProject(@RequestBody Project project) {
+        Project savedProject = projectService.createProject(project, "API_USER", "SYSTEM");
+        return ResponseEntity.ok(ApiResponse.ok(savedProject));
+    }
 }

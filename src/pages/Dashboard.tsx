@@ -20,10 +20,11 @@ import {
   Calendar,
   Layers
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [selectedState, setSelectedState] = useState('ALL');
@@ -206,79 +207,91 @@ export const Dashboard: React.FC = () => {
       {/* Top 7 Core KPI Metric Cards (Dense, formal NIC styling) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Total Projects */}
-        <div className="bg-white border-l-4 border-l-[#0B3559] border border-slate-200 rounded p-3 shadow-sm">
+        <div 
+          onClick={() => navigate('/projects')}
+          className="bg-white border-l-4 border-l-[#0B3559] border border-slate-200 rounded p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between text-slate-500 text-[11px] font-medium">
             <span>Total Projects</span>
             <FolderGit2 className="w-4 h-4 text-[#0B3559]" />
           </div>
           <div className="text-2xl font-bold text-slate-900 mt-1 font-mono">
-            {isLoading ? '...' : stats?.totalProjects ?? 10}
+            {isLoading ? '...' : stats?.totalProjects || 0}
           </div>
           <div className="text-[10px] text-slate-500 mt-0.5">National &amp; State Requisitions</div>
         </div>
 
         {/* Land Proposed vs Acquired */}
-        <div className="bg-white border-l-4 border-l-emerald-600 border border-slate-200 rounded p-3 shadow-sm">
+        <div 
+          onClick={() => navigate('/parcels')}
+          className="bg-white border-l-4 border-l-emerald-600 border border-slate-200 rounded p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between text-slate-500 text-[11px] font-medium">
             <span>Land Acquired / Req</span>
             <MapPin className="w-4 h-4 text-emerald-700" />
           </div>
           <div className="text-2xl font-bold text-emerald-800 mt-1 font-mono">
-            {isLoading ? '...' : `${stats?.totalLandAcquiredHectares?.toFixed(1) ?? '3,395.6'} Ha`}
+            {isLoading ? '...' : `${stats?.totalLandAcquiredHectares?.toFixed(1) || '0.0'} Ha`}
           </div>
           <div className="text-[10px] text-slate-500 mt-0.5">
-            of {stats?.totalLandRequiredHectares?.toFixed(1) ?? '4,985.5'} Ha Total (68.1%)
+            of {stats?.totalLandRequiredHectares?.toFixed(1) || '0.0'} Ha Total
           </div>
         </div>
 
         {/* Parcels Pending Verification */}
-        <div className="bg-white border-l-4 border-l-amber-500 border border-slate-200 rounded p-3 shadow-sm">
+        <div 
+          onClick={() => navigate('/parcels?status=PENDING_VERIFICATION')}
+          className="bg-white border-l-4 border-l-amber-500 border border-slate-200 rounded p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between text-slate-500 text-[11px] font-medium">
             <span>Pending Survey</span>
             <Clock className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-2xl font-bold text-amber-700 mt-1 font-mono">
-            {isLoading ? '...' : stats?.parcelsPendingVerification ?? 143}
+            {isLoading ? '...' : stats?.parcelsPendingVerification || 0}
           </div>
           <div className="text-[10px] text-slate-500 mt-0.5">Field Inspection Due</div>
         </div>
 
         {/* Compensation Disbursed */}
-        <div className="bg-white border-l-4 border-l-cyan-600 border border-slate-200 rounded p-3 shadow-sm">
+        <div 
+          onClick={() => navigate('/compensation')}
+          className="bg-white border-l-4 border-l-cyan-600 border border-slate-200 rounded p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between text-slate-500 text-[11px] font-medium">
             <span>PFMS Disbursal</span>
             <IndianRupee className="w-4 h-4 text-cyan-700" />
           </div>
           <div className="text-2xl font-bold text-slate-900 mt-1 font-mono">
-            {isLoading ? '...' : `₹${stats?.compensationDisbursedCr?.toFixed(1) ?? '1,950.6'} Cr`}
+            {isLoading ? '...' : `₹${stats?.compensationDisbursedCr?.toFixed(1) || '0.0'} Cr`}
           </div>
           <div className="text-[10px] text-slate-500 mt-0.5">
-            of ₹{stats?.compensationAssessedCr?.toFixed(1) ?? '3,136.4'} Cr Assessed
+            of ₹{stats?.compensationAssessedCr?.toFixed(1) || '0.0'} Cr Assessed
           </div>
         </div>
 
         {/* Affected & Rehabilitated Families */}
-        <div className="bg-white border-l-4 border-l-purple-600 border border-slate-200 rounded p-3 shadow-sm">
+        <div 
+          onClick={() => navigate('/randr')}
+          className="bg-white border-l-4 border-l-purple-600 border border-slate-200 rounded p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between text-slate-500 text-[11px] font-medium">
             <span>R&amp;R Resettled</span>
             <Users className="w-4 h-4 text-purple-700" />
           </div>
           <div className="text-2xl font-bold text-purple-900 mt-1 font-mono">
-            {isLoading ? '...' : `${stats?.rehabilitatedFamilies ?? 1672}`}
+            {isLoading ? '...' : `${stats?.rehabilitatedFamilies || 0}`}
           </div>
           <div className="text-[10px] text-slate-500 mt-0.5">
-            of {stats?.totalAffectedFamilies ?? 2450} Families (68.2%)
+            of {stats?.totalAffectedFamilies || 0} Families
           </div>
         </div>
 
         {/* Delayed / At Risk Escalations */}
-        <div className="bg-white border-l-4 border-l-red-600 border border-slate-200 rounded p-3 shadow-sm">
+        <div 
+          onClick={() => navigate('/alerts')}
+          className="bg-white border-l-4 border-l-red-600 border border-slate-200 rounded p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between text-slate-500 text-[11px] font-medium">
             <span>Delayed / At Risk</span>
             <AlertTriangle className="w-4 h-4 text-red-600" />
           </div>
           <div className="text-2xl font-bold text-red-700 mt-1 font-mono">
-            {isLoading ? '...' : `${(stats?.delayedCases ?? 1) + (stats?.atRiskCases ?? 2)} Cases`}
+            {isLoading ? '...' : `${(stats?.delayedCases || 0) + (stats?.atRiskCases || 0)} Cases`}
           </div>
           <div className="text-[10px] text-red-600 mt-0.5">Statutory Delay Flagged</div>
         </div>

@@ -21,6 +21,11 @@ public class DashboardController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDashboardStats(
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String district) {
-        return ResponseEntity.ok(ApiResponse.ok(dashboardService.getDashboardStats(state, district)));
+        
+        // Handle frontend's 'ALL' value as null to ignore filtering
+        String filterState = "ALL".equalsIgnoreCase(state) ? null : state;
+        String filterDistrict = "ALL".equalsIgnoreCase(district) ? null : district;
+        
+        return ResponseEntity.ok(ApiResponse.ok(dashboardService.getDashboardStats(filterState, filterDistrict)));
     }
 }
