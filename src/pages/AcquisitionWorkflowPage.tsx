@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { getRoleConfig } from '../config/roleConfig';
 import {
   GitMerge, FileText, Search, Megaphone, MessageSquare,
   Scale, IndianRupee, Home, Key, CheckCircle2,
-  Clock, AlertTriangle, ChevronRight, Info
+  Clock, AlertTriangle, ChevronRight, Info, Lock, ShieldCheck, RotateCcw, ArrowRight
 } from 'lucide-react';
 
 interface WorkflowStep {
@@ -19,7 +21,9 @@ interface WorkflowStep {
   remarks?: string;
 }
 
-const steps: WorkflowStep[] = [
+const STORAGE_KEY = 'bhoomisetu_workflow_stages';
+
+const INITIAL_STEPS: WorkflowStep[] = [
   {
     id: 1,
     stage: 'Stage 1',
@@ -189,6 +193,32 @@ const steps: WorkflowStep[] = [
   },
 ];
 
+const loadStepsFromStorage = (): WorkflowStep[] => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return INITIAL_STEPS.map(initial => {
+          const match = parsed.find((p: any) => p.id === initial.id);
+          if (match) {
+            return {
+              ...initial,
+              status: match.status ?? initial.status,
+              completedOn: match.completedOn ?? initial.completedOn,
+              remarks: match.remarks ?? initial.remarks,
+            };
+          }
+          return initial;
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load workflow steps from localStorage', err);
+  }
+  return INITIAL_STEPS;
+};
+
 const statusConfig = {
   COMPLETED: { bg: 'bg-emerald-600', text: 'text-emerald-700', badge: 'bg-emerald-50 text-emerald-800 border-emerald-200', label: 'Completed' },
   ACTIVE:    { bg: 'bg-amber-500',   text: 'text-amber-700',   badge: 'bg-amber-50 text-amber-800 border-amber-300',   label: 'In Progress' },
@@ -197,6 +227,11 @@ const statusConfig = {
 };
 
 export const AcquisitionWorkflowPage: React.FC = () => {
+  const { user } = useAuth();
+  const roleConfig = getRoleConfig(user?.role);
+  const canAdvance = roleConfig.permissions.canAdvanceWorkflow;
+
+  const [steps, setSteps] = useState<WorkflowStep[]>(loadStepsFromStorage);
   const [expanded, setExpanded] = useState<number | null>(4);
   const [showObjectionModal, setShowObjectionModal] = useState(false);
   const [objectionStatus, setObjectionStatus] = useState<'IDLE' | 'SUBMITTING' | 'SUCCESS'>('IDLE');
@@ -204,6 +239,51 @@ export const AcquisitionWorkflowPage: React.FC = () => {
 
   const completedCount = steps.filter(s => s.status === 'COMPLETED').length;
   const activeStep = steps.find(s => s.status === 'ACTIVE');
+
+  const handleAdvanceStage = (stepId: number) => {
+    if (!canAdvance) return;
+
+    const today = new Date().toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    setSteps(prevSteps => {
+      const nextSteps = prevSteps.map(s => {
+        if (s.id === stepId) {
+          return {
+            ...s,
+            status: 'COMPLETED' as const,
+            completedOn: s.completedOn || today,
+          };
+        }
+        if (s.id === stepId + 1 && s.status === 'PENDING') {
+          return {
+            ...s,
+            status: 'ACTIVE' as const,
+          };
+        }
+        return s;
+      });
+
+      const toSave = nextSteps.map(({ icon, ...rest }) => rest);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+
+      return nextSteps;
+    });
+
+    // Automatically expand the newly active stage if any
+    if (stepId < steps.length) {
+      setExpanded(stepId + 1);
+    }
+  };
+
+  const handleResetWorkflow = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setSteps(INITIAL_STEPS);
+    setExpanded(4);
+  };
 
   return (
     <div className="space-y-4">
@@ -215,11 +295,23 @@ export const AcquisitionWorkflowPage: React.FC = () => {
               <GitMerge className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-sm font-bold text-[#0B3559]">Acquisition Workflow — RFCTLARR Act, 2013</h1>
-              <p className="text-xs text-slate-500">Step-by-step statutory process from Sec 4 Requisition to Revenue Mutation</p>
+              <div className="flex items-center space-x-2">
+                <h1 className="text-sm font-bold text-[#0B3559]">Acquisition Workflow — RFCTLARR Act, 2013</h1>
+                {canAdvance ? (
+                  <span className="text-[10px] font-semibold bg-blue-50 text-blue-800 border border-blue-200 px-2 py-0.5 rounded flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-blue-600" /> CALA Mode (Can Advance)
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-slate-400" /> Viewing Statutory Progress (Read-Only)
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">Step-by-step statutory process from Sec 4 Requisition to Revenue Mutation</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+
+          <div className="flex items-center space-x-2 flex-wrap gap-y-2">
             <span className="text-xs font-mono bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-1 rounded">
               {completedCount} / {steps.length} Stages Complete
             </span>
@@ -227,6 +319,15 @@ export const AcquisitionWorkflowPage: React.FC = () => {
               <span className="text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-300 px-2 py-1 rounded flex items-center gap-1">
                 <Clock className="w-3 h-3" /> Active: {activeStep.title}
               </span>
+            )}
+            {canAdvance && (
+              <button
+                onClick={handleResetWorkflow}
+                className="text-[11px] text-slate-500 hover:text-slate-800 underline flex items-center gap-1 px-1.5 py-1"
+                title="Reset to default initial stages"
+              >
+                <RotateCcw className="w-3 h-3" /> Reset
+              </button>
             )}
             <button
               onClick={() => setShowObjectionModal(true)}
@@ -246,7 +347,7 @@ export const AcquisitionWorkflowPage: React.FC = () => {
           </div>
           <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-2 bg-gradient-to-r from-[#0B3559] to-emerald-600 rounded-full transition-all"
+              className="h-2 bg-gradient-to-r from-[#0B3559] to-emerald-600 rounded-full transition-all duration-500"
               style={{ width: `${(completedCount / steps.length) * 100}%` }}
             />
           </div>
@@ -256,8 +357,8 @@ export const AcquisitionWorkflowPage: React.FC = () => {
       {/* Summary KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Stages Completed', val: `${completedCount}`, sub: 'of 10 total', color: 'border-l-emerald-600' },
-          { label: 'Active Stage', val: 'Stage 4', sub: 'Sec 15 Hearing', color: 'border-l-amber-500' },
+          { label: 'Stages Completed', val: `${completedCount}`, sub: `of ${steps.length} total`, color: 'border-l-emerald-600' },
+          { label: 'Active Stage', val: activeStep ? activeStep.stage : 'All Done', sub: activeStep ? activeStep.section : 'Workflow Complete', color: 'border-l-amber-500' },
           { label: 'Days Elapsed', val: '312', sub: 'Since Sec 4 notification', color: 'border-l-[#0B3559]' },
           { label: 'Objections Pending', val: '12', sub: '3 hearings due', color: 'border-l-red-500' },
         ].map(k => (
@@ -269,7 +370,7 @@ export const AcquisitionWorkflowPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Steps */}
+      {/* Steps List */}
       <div className="space-y-2">
         {steps.map((step, idx) => {
           const cfg = statusConfig[step.status];
@@ -289,7 +390,7 @@ export const AcquisitionWorkflowPage: React.FC = () => {
                   {step.status === 'COMPLETED' ? (
                     <CheckCircle2 className="w-4 h-4 text-white" />
                   ) : step.status === 'ACTIVE' ? (
-                    <Clock className="w-4 h-4 text-white" />
+                    <Clock className="w-4 h-4 text-white animate-pulse" />
                   ) : (
                     <span className="text-xs font-bold text-slate-400">{step.id}</span>
                   )}
@@ -299,11 +400,11 @@ export const AcquisitionWorkflowPage: React.FC = () => {
 
               {/* Card */}
               <div className="flex-1 mb-2">
-                <button
-                  onClick={() => setExpanded(isExpanded ? null : step.id)}
-                  className="w-full text-left bg-white border border-slate-200 rounded shadow-sm hover:border-slate-300 transition-colors"
-                >
-                  <div className="p-3.5 flex items-start justify-between gap-2">
+                <div className="bg-white border border-slate-200 rounded shadow-sm hover:border-slate-300 transition-colors">
+                  <button
+                    onClick={() => setExpanded(isExpanded ? null : step.id)}
+                    className="w-full text-left p-3.5 flex items-start justify-between gap-2"
+                  >
                     <div className="flex items-start gap-3">
                       <div className={`w-7 h-7 rounded flex items-center justify-center flex-shrink-0 ${
                         step.status === 'COMPLETED' ? 'bg-emerald-50' :
@@ -326,8 +427,39 @@ export const AcquisitionWorkflowPage: React.FC = () => {
                       <span className="text-[11px] text-slate-400 hidden sm:block">{step.deadline}</span>
                       <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                     </div>
-                  </div>
-                </button>
+                  </button>
+
+                  {/* Inline Action Bar for Active Step */}
+                  {step.status === 'ACTIVE' && (
+                    <div className="px-3.5 py-2.5 bg-amber-50/70 border-t border-amber-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                      <div className="text-xs">
+                        <span className="font-bold text-amber-900">Stage Actionable</span>
+                        <p className="text-[11px] text-amber-800">
+                          {canAdvance 
+                            ? 'As CALA, click advance once all statutory substeps for this stage are satisfied.' 
+                            : 'Viewing Statutory Progress (Read-Only)'}
+                        </p>
+                      </div>
+                      {canAdvance ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAdvanceStage(step.id);
+                          }}
+                          className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded shadow flex items-center gap-1.5 transition-colors shrink-0"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Advance to Next Statutory Stage</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      ) : (
+                        <span className="px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-300 text-[11px] font-semibold rounded flex items-center gap-1 shrink-0">
+                          <Lock className="w-3 h-3 text-slate-400" /> Read-Only Mode
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {/* Expanded content */}
                 {isExpanded && (
@@ -377,6 +509,19 @@ export const AcquisitionWorkflowPage: React.FC = () => {
                         </div>
                       )}
                     </div>
+
+                    {step.status === 'ACTIVE' && canAdvance && (
+                      <div className="pt-2 border-t border-slate-200 flex justify-end">
+                        <button
+                          onClick={() => handleAdvanceStage(step.id)}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded shadow flex items-center gap-1.5 transition-colors"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Complete Stage &amp; Advance to Next Stage</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

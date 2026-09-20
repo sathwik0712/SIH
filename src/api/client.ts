@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+// Base URL is read from environment — set VITE_API_BASE_URL in your .env file.
+// Falls back to localhost for local development only.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api';
+
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -11,7 +14,7 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
   const token = localStorage.getItem('bhoomisetu_token');
 
   const headers: HeadersInit = {
-    ...(options.headers || {}),
+    ...options.headers,
   };
 
   // Only set Content-Type to application/json if we are not sending FormData

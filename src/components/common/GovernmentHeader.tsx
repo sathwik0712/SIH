@@ -1,13 +1,14 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Bell, LogOut, Globe, Shield, ExternalLink, Search } from 'lucide-react';
+import { Bell, LogOut, Globe, Search, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Props {
   children?: React.ReactNode;
+  onToggleMobileMenu?: () => void;
 }
 
-export const GovernmentHeader: React.FC<Props> = ({ children }) => {
+export const GovernmentHeader: React.FC<Props> = ({ children, onToggleMobileMenu }) => {
   const { user, logout } = useAuth();
 
   const getRoleBadgeStyle = (role?: string) => {
@@ -54,25 +55,38 @@ export const GovernmentHeader: React.FC<Props> = ({ children }) => {
 
       {/* Main Header Bar (Deep Rich Navy #0B3559) */}
       <div className="bg-[#0B3559] text-white px-4 py-2.5 flex justify-between items-center border-b border-[#082541]">
-        {/* Brand Treatment */}
-        <Link to="/dashboard" className="flex items-center space-x-3 group">
-          <div className="w-10 h-10 rounded border border-amber-400/40 bg-[#071E3D] flex items-center justify-center font-serif font-bold text-lg tracking-wider text-amber-400 shadow-inner">
-            BS
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xl font-serif font-bold tracking-tight text-white group-hover:text-amber-300 transition-colors">
-                BHOOMISETU
-              </span>
-              <span className="text-[11px] px-1.5 py-0.5 rounded bg-white/10 text-amber-300 border border-white/15 font-normal">
-                भूमि सेतु
-              </span>
+        <div className="flex items-center space-x-3">
+          {user && onToggleMobileMenu && (
+            <button
+              onClick={onToggleMobileMenu}
+              className="md:hidden p-1.5 -ml-1 text-slate-200 hover:text-white hover:bg-white/10 rounded transition-colors"
+              aria-label="Open Navigation Menu"
+              id="mobile-menu-toggle-btn"
+            >
+              <Menu className="w-5 h-5 text-amber-400" />
+            </button>
+          )}
+
+          {/* Brand Treatment */}
+          <Link to="/dashboard" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 rounded border border-amber-400/40 bg-[#071E3D] flex items-center justify-center font-serif font-bold text-lg tracking-wider text-amber-400 shadow-inner">
+              BS
             </div>
-            <p className="text-[11px] text-slate-300 tracking-wide font-sans">
-              National Land Acquisition &amp; Management System (RFCTLARR Act, 2013)
-            </p>
-          </div>
-        </Link>
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xl font-serif font-bold tracking-tight text-white group-hover:text-amber-300 transition-colors">
+                  BHOOMISETU
+                </span>
+                <span className="text-[11px] px-1.5 py-0.5 rounded bg-white/10 text-amber-300 border border-white/15 font-normal hidden sm:inline">
+                  भूमि सेतु
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300 tracking-wide font-sans hidden sm:block">
+                National Land Acquisition &amp; Management System (RFCTLARR Act, 2013)
+              </p>
+            </div>
+          </Link>
+        </div>
 
         {/* User Info and Quick Actions */}
         {user ? (

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { apiFetch } from '../api/client';
+import { useAuth } from '../context/AuthContext';
+import { getRoleConfig } from '../config/roleConfig';
 import type { LandParcel } from '../types';
 import type { Column } from '../components/common/DataTable';
 import { DataTable } from '../components/common/DataTable';
@@ -7,6 +9,12 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { Plus, History } from 'lucide-react';
 
 export const LandParcels: React.FC = () => {
+  const { user } = useAuth();
+  // Derive granular permissions from role config.
+  const roleConfig = getRoleConfig(user?.role);
+  const canEditParcel = roleConfig.permissions.canEditParcel;
+  const maskPII = roleConfig.permissions.maskPII;
+
   const [parcels, setParcels] = useState<LandParcel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -117,12 +125,27 @@ export const LandParcels: React.FC = () => {
       key: 'ownerName',
       header: 'Title Holder (Owner)',
       sortable: true,
-      render: item => (
-        <div>
-          <span className="font-medium text-slate-900">{item.ownerName}</span>
-          <span className="text-[10px] text-slate-400 block">{item.ownershipType}</span>
-        </div>
-      ),
+      render: item => {
+        if (maskPII) {
+          // Mask each word to its first letter followed by ****
+          const maskedName = item.ownerName
+            .split(' ')
+            .map(w => (w.length > 0 ? w[0] + '****' : ''))
+            .join(' ');
+          return (
+            <div>
+              <span className="font-medium text-slate-500 italic select-none">{maskedName}</span>
+              <span className="text-[10px] text-slate-300 block select-none">— PII masked —</span>
+            </div>
+          );
+        }
+        return (
+          <div>
+            <span className="font-medium text-slate-900">{item.ownerName}</span>
+            <span className="text-[10px] text-slate-400 block">{item.ownershipType}</span>
+          </div>
+        );
+      },
     },
     {
       key: 'verificationStatus',
@@ -167,13 +190,16 @@ export const LandParcels: React.FC = () => {
             Survey-level spatial land inventory with verified revenue boundaries and ownership records.
           </p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-gov-navy-800 hover:bg-gov-navy-900 text-white rounded text-xs font-semibold shadow-sm transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Add Land Parcel</span>
-        </button>
+        {/* Only roles with canEditParcel may add new parcels */}
+        {canEditParcel && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-gov-navy-800 hover:bg-gov-navy-900 text-white rounded text-xs font-semibold shadow-sm transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Land Parcel</span>
+          </button>
+        )}
       </div>
 
       {isModalOpen && (

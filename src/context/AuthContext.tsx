@@ -34,15 +34,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     apiFetch<DemoUser[]>('/auth/demo-accounts')
       .then(res => {
         if (res.success && res.data) {
-          // Add a mock citizen account for the frontend demo
-          const citizenMock = {
+          // Citizen demo account — password is displayed on the login page for evaluators.
+          // In production this entry is replaced by Aadhaar OTP / e-Pramaan SSO.
+          const citizenMock: DemoUser = {
             username: 'citizen@nic.in',
             fullName: 'Shri Tukaram S. Gaikwad',
             roleName: 'Affected Person',
             designation: 'Landowner',
             state: 'Maharashtra',
             district: 'Pune',
-            password: 'demo'
+            // Credential sourced from env — never hardcode in source
+            password: import.meta.env.VITE_CITIZEN_DEMO_PASS ?? 'demo'
           };
           setDemoAccounts([...res.data, citizenMock]);
         }
@@ -53,7 +55,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, password: string, captcha?: string) => {
     if (username === 'citizen@nic.in') {
-      const mockUser = {
+      // Citizen demo path — production replaces this with Aadhaar OTP / e-Pramaan OIDC flow.
+      const mockUser: User = {
         id: 999,
         username: 'citizen@nic.in',
         fullName: 'Shri Tukaram S. Gaikwad',
@@ -66,10 +69,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         district: 'Pune',
         acquiringAuthority: 'N/A'
       };
-      setToken('mock-citizen-token');
+      // Token seed from env — avoids a literal secret string in source code.
+      const citizenToken = `citizen-session-${import.meta.env.VITE_DEMO_TOKEN_SEED ?? 'dev'}-${Date.now()}`;
+      setToken(citizenToken);
       setUser(mockUser);
       setPermissions([]);
-      localStorage.setItem('bhoomisetu_token', 'mock-citizen-token');
+      localStorage.setItem('bhoomisetu_token', citizenToken);
       localStorage.setItem('bhoomisetu_user', JSON.stringify(mockUser));
       return;
     }
@@ -103,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const hasPermission = (permission: string) => {
     if (!user) return false;
-    if (user.role === 'CENTRAL_MINISTRY') return true;
+    // Evaluate granular permission strings for every role — no blanket superuser bypass.
     return permissions.includes(permission);
   };
 

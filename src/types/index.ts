@@ -4,7 +4,8 @@ export type RoleType =
   | 'DISTRICT_AUTHORITY'
   | 'LAND_ACQUIRING_AUTHORITY'
   | 'FIELD_OFFICER'
-  | 'EXECUTIVE_VIEWER';
+  | 'EXECUTIVE_VIEWER'
+  | 'CITIZEN';
 
 export interface User {
   id: number;
