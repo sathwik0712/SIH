@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, FileText, Search, Filter, CheckCircle2, AlertCircle, Calendar } from 'lucide-react';
+import { Award, FileText, Search, Filter, AlertCircle, Calendar } from 'lucide-react';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { apiFetch } from '../api/client';
 

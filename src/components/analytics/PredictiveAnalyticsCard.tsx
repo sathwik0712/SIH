@@ -3,12 +3,7 @@ import { AuthenticProject } from '../../types/project';
 import { WhatIfMitigationOption } from '../../types/analytics';
 import {
   TrendingUp,
-  AlertTriangle,
-  Zap,
-  CheckCircle2,
-  Clock,
   ShieldAlert,
-  ArrowRight,
   Sparkles,
   Sliders,
   Check
@@ -54,7 +49,7 @@ export const PredictiveAnalyticsCard: React.FC<Props> = ({ project }) => {
 
   // Recalculate based on enabled mitigations
   const totalReductionDays = mitigations.filter(m => m.enabled).reduce((sum, m) => sum + m.delayReductionDays, 0);
-  const totalMitigationCost = mitigations.filter(m => m.enabled).reduce((sum, m) => sum + m.costImpactCr, 0);
+  const _totalMitigationCost = mitigations.filter(m => m.enabled).reduce((sum, m) => sum + m.costImpactCr, 0);
 
   const activeDelayDays = Math.max(0, baseDelayDays - totalReductionDays);
   const activeRiskScore = Math.max(10, Math.round(baseRiskScore - totalReductionDays * 0.8));

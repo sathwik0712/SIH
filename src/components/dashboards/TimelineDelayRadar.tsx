@@ -1,12 +1,8 @@
 import React from 'react';
 import { AuthenticProject } from '../../types/project';
 import {
-  AlertTriangle,
-  Clock,
-  CheckCircle2,
   ArrowRight,
-  ShieldAlert,
-  Calendar
+  ShieldAlert
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

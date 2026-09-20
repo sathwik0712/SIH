@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Key, CheckCircle2, Clock, AlertTriangle, MapPin, FileText, Download, Filter, Search, Calendar } from 'lucide-react';
+import { Key, CheckCircle2, Clock, AlertTriangle, MapPin, Download, Filter, Search, Calendar } from 'lucide-react';
 
 interface PossessionRecord {
   id: string;

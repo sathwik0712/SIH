@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, FileText, UploadCloud, CheckCircle2, AlertCircle, Clock, Download } from 'lucide-react';
+import { Users, UploadCloud, CheckCircle2, AlertCircle, Clock, Download } from 'lucide-react';
 import { StatusBadge } from '../components/common/StatusBadge';
 
 const MOCK_SIA = [

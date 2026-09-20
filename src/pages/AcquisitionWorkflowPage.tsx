@@ -267,7 +267,7 @@ export const AcquisitionWorkflowPage: React.FC = () => {
         return s;
       });
 
-      const toSave = nextSteps.map(({ icon, ...rest }) => rest);
+      const toSave = nextSteps.map(({ icon: _icon, ...rest }) => rest);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
 
       return nextSteps;

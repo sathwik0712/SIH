@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { apiFetch } from '../../api/client';
-import type { DashboardStats, ProjectSummary } from '../../types';
+import type { ProjectSummary } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
 import {
   Building2,
@@ -9,9 +9,7 @@ import {
   MapPin,
   CheckSquare,
   AlertTriangle,
-  ArrowRight,
-  Clock,
-  ShieldAlert
+  Clock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { TimelineDelayRadar } from './TimelineDelayRadar';
@@ -20,7 +18,6 @@ import { SEED_PROJECTS } from '../../data/seedProjects';
 export const StateDashboard: React.FC = () => {
   const { user } = useAuth();
   const userState = user?.state || 'Maharashtra';
-  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

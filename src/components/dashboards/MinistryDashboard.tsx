@@ -8,7 +8,6 @@ import {
   MapPin,
   IndianRupee,
   Users,
-  ShieldCheck,
   BarChart3,
   Globe,
   Lock,

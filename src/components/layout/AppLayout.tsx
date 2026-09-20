@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Navigate, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { HelpCircle, Server, X, Shield, Smartphone } from 'lucide-react';
+import { HelpCircle, Server, X } from 'lucide-react';
 import { GovernmentHeader } from '../common/GovernmentHeader';
 import { Sidebar } from '../common/Sidebar';
 import { Breadcrumbs } from '../common/Breadcrumbs';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import type { DemoUser } from '../types';
-import { Shield, KeyRound, User as UserIcon, RefreshCw, AlertCircle, CheckCircle2, Lock, ArrowRight, Building2 } from 'lucide-react';
+import { Shield, KeyRound, User as UserIcon, RefreshCw, AlertCircle, CheckCircle2, Lock, ArrowRight } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +12,6 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('admin123');
   const [captchaInput, setCaptchaInput] = useState('');
   const [captchaCode, setCaptchaCode] = useState('7K9P2');
-  const [selectedRole, setSelectedRole] = useState('Central Ministry');
 
   const [showDigiLocker, setShowDigiLocker] = useState(false);
   const [digiLockerStep, setDigiLockerStep] = useState(0);
@@ -41,7 +40,6 @@ export const Login: React.FC = () => {
   };
 
   const handleSelectDemoUser = (account: DemoUser) => {
-    setSelectedRole(account.roleName);
     setUsername(account.username);
     setPassword(account.password);
     setCaptchaInput(captchaCode);

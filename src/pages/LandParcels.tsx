@@ -31,7 +31,7 @@ export const LandParcels: React.FC = () => {
     ownerName: '',
   });
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
-  const [selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
+  const [_selectedParcelId, setSelectedParcelId] = useState<string | null>(null);
   const [parcelHistory, setParcelHistory] = useState<any[]>([]);
 
   const loadHistory = (parcelId: string) => {

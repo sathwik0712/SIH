@@ -2,16 +2,50 @@ import React, { useState } from 'react';
 import { Map, Layers, Filter, Info } from 'lucide-react';
 import { CadastralMap, Parcel } from '../components/gis/CadastralMap';
 
-// Mock parcel data for demonstration
+// Mock parcel data with GeoJSON polygon boundaries for cadastral overlay
+// Boundaries are irregular quadrilaterals sized proportionally to each parcel's hectare area.
+// Coordinates are WGS84 (lat, lng) around Pune District — Bhosari / Chikhali / Moshi survey areas.
 const MOCK_PARCELS: Parcel[] = [
-  { id: 'P001', surveyNo: '14/2A', owner: 'Ramesh Patil', area: 1.2, status: 'ACQUIRED', lat: 18.520, lng: 73.855, village: 'Bhosari', compensation: '₹24.6L' },
-  { id: 'P002', surveyNo: '14/2B', owner: 'Sunita Deshpande', area: 0.8, status: 'PENDING', lat: 18.522, lng: 73.858, village: 'Bhosari', compensation: '₹16.4L' },
-  { id: 'P003', surveyNo: '15/1', owner: 'Govind Shinde', area: 2.5, status: 'DISPUTED', lat: 18.518, lng: 73.852, village: 'Bhosari', compensation: '₹51.2L' },
-  { id: 'P004', surveyNo: '16/3', owner: 'Lata Kulkarni', area: 1.8, status: 'ACQUIRED', lat: 18.525, lng: 73.860, village: 'Chikhali', compensation: '₹36.9L' },
-  { id: 'P005', surveyNo: '16/4', owner: 'Vijay More', area: 0.6, status: 'NOTIFIED', lat: 18.516, lng: 73.862, village: 'Chikhali', compensation: '₹12.3L' },
-  { id: 'P006', surveyNo: '17/1', owner: 'Anita Jadhav', area: 3.1, status: 'ACQUIRED', lat: 18.528, lng: 73.856, village: 'Moshi', compensation: '₹63.5L' },
-  { id: 'P007', surveyNo: '17/2', owner: 'Suresh Kale', area: 1.4, status: 'PENDING', lat: 18.513, lng: 73.849, village: 'Moshi', compensation: '₹28.7L' },
-  { id: 'P008', surveyNo: '18/1', owner: 'Priya Gaikwad', area: 2.2, status: 'DISPUTED', lat: 18.530, lng: 73.863, village: 'Moshi', compensation: '₹45.1L' },
+  {
+    id: 'P001', surveyNo: '14/2A', owner: 'Ramesh Patil', area: 1.2, status: 'ACQUIRED',
+    lat: 18.520, lng: 73.855, village: 'Bhosari', compensation: '₹24.6L',
+    boundary: [[18.5194, 73.8543], [18.5192, 73.8558], [18.5207, 73.8560], [18.5209, 73.8544]],
+  },
+  {
+    id: 'P002', surveyNo: '14/2B', owner: 'Sunita Deshpande', area: 0.8, status: 'PENDING',
+    lat: 18.522, lng: 73.858, village: 'Bhosari', compensation: '₹16.4L',
+    boundary: [[18.5215, 73.8573], [18.5213, 73.8588], [18.5226, 73.8590], [18.5228, 73.8575]],
+  },
+  {
+    id: 'P003', surveyNo: '15/1', owner: 'Govind Shinde', area: 2.5, status: 'DISPUTED',
+    lat: 18.518, lng: 73.852, village: 'Bhosari', compensation: '₹51.2L',
+    boundary: [[18.5170, 73.8508], [18.5166, 73.8534], [18.5192, 73.8537], [18.5196, 73.8510]],
+  },
+  {
+    id: 'P004', surveyNo: '16/3', owner: 'Lata Kulkarni', area: 1.8, status: 'ACQUIRED',
+    lat: 18.525, lng: 73.860, village: 'Chikhali', compensation: '₹36.9L',
+    boundary: [[18.5242, 73.8591], [18.5240, 73.8612], [18.5260, 73.8614], [18.5262, 73.8593]],
+  },
+  {
+    id: 'P005', surveyNo: '16/4', owner: 'Vijay More', area: 0.6, status: 'NOTIFIED',
+    lat: 18.516, lng: 73.862, village: 'Chikhali', compensation: '₹12.3L',
+    boundary: [[18.5155, 73.8614], [18.5154, 73.8627], [18.5165, 73.8628], [18.5166, 73.8615]],
+  },
+  {
+    id: 'P006', surveyNo: '17/1', owner: 'Anita Jadhav', area: 3.1, status: 'ACQUIRED',
+    lat: 18.528, lng: 73.856, village: 'Moshi', compensation: '₹63.5L',
+    boundary: [[18.5268, 73.8545], [18.5264, 73.8578], [18.5296, 73.8582], [18.5300, 73.8548]],
+  },
+  {
+    id: 'P007', surveyNo: '17/2', owner: 'Suresh Kale', area: 1.4, status: 'PENDING',
+    lat: 18.513, lng: 73.849, village: 'Moshi', compensation: '₹28.7L',
+    boundary: [[18.5123, 73.8481], [18.5121, 73.8500], [18.5139, 73.8502], [18.5141, 73.8483]],
+  },
+  {
+    id: 'P008', surveyNo: '18/1', owner: 'Priya Gaikwad', area: 2.2, status: 'DISPUTED',
+    lat: 18.530, lng: 73.863, village: 'Moshi', compensation: '₹45.1L',
+    boundary: [[18.5290, 73.8620], [18.5287, 73.8645], [18.5314, 73.8648], [18.5317, 73.8622]],
+  },
 ];
 
 const statusColors: Record<string, { dot: string; badge: string; label: string }> = {
@@ -98,13 +132,21 @@ export const GISMapPage: React.FC = () => {
           </div>
 
           {/* Legend */}
-          <div className="p-3 border-t border-slate-200 bg-slate-50 flex flex-wrap gap-4 mt-auto">
+          <div className="p-3 border-t border-slate-200 bg-slate-50 flex flex-wrap items-center gap-4 mt-auto">
             {Object.entries(statusColors).map(([key, val]) => (
               <div key={key} className="flex items-center gap-1.5 text-xs text-slate-700">
-                <div className="w-3 h-3 rounded-full border border-white shadow" style={{ background: val.dot }} />
+                <div
+                  className="w-4 h-3 border-2 rounded-sm"
+                  style={{
+                    background: `${val.dot}30`,
+                    borderColor: val.dot,
+                    borderStyle: key === 'DISPUTED' ? 'dashed' : 'solid',
+                  }}
+                />
                 <span>{val.label}</span>
               </div>
             ))}
+            <span className="text-[10px] text-slate-400 font-mono ml-auto">Cadastral Polygon Overlay · WGS84</span>
           </div>
         </div>
 

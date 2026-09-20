@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, MessageSquare, Megaphone, IndianRupee, Inbox, Clock, CheckCircle2, Search } from 'lucide-react';
+import { Mail, MessageSquare, Megaphone, IndianRupee, Inbox, Clock, Search } from 'lucide-react';
 
 interface AppNotification {
   id: string;

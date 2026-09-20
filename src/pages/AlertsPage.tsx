@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, AlertTriangle, Clock, Info, CheckCircle2, Search, Filter } from 'lucide-react';
+import { Bell, AlertTriangle, Clock, Info, CheckCircle2 } from 'lucide-react';
 
 interface Alert {
   id: string;

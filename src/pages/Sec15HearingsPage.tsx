@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Gavel, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
-import { StatusBadge } from '../components/common/StatusBadge';
 
 const MOCK_HEARINGS = [
   { id: 'HRG-101', projectCode: 'NH65-HYD-PUN-01', objector: 'Smt. Rukmini B. Jadhav', parcelId: 'LP-SOL-047', hearingDate: '2025-05-28 10:30 AM', objectionType: 'Valuation of crop trees', attendance: 'PRESENT', status: 'PENDING_DECISION', slecRecommendation: '—' },

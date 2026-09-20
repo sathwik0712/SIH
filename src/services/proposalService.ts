@@ -1,5 +1,4 @@
-import { Proposal, ProposalStatus, ScrutinyChecklist, ProposalAuditLog } from '../types/proposal';
-import { apiFetch } from '../api/client';
+import { Proposal, ProposalStatus, ScrutinyChecklist } from '../types/proposal';
 
 const STORAGE_KEY = 'bhoomisetu_proposals_store_v1';
 

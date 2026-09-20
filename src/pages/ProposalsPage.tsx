@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { Proposal, ProposalStatus } from '../types/proposal';
 import { getStoredProposals } from '../services/proposalService';
 import { StateProposalScrutiny } from '../components/proposals/StateProposalScrutiny';
@@ -10,18 +9,11 @@ import {
   Plus,
   Search,
   Filter,
-  Building,
-  MapPin,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-  Eye,
-  ArrowRight
+  Eye
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const ProposalsPage: React.FC = () => {
-  const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');

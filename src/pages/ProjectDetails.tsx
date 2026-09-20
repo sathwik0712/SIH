@@ -7,7 +7,7 @@ import { ProjectTimelineGantt } from '../components/projects/ProjectTimelineGant
 import { PredictiveAnalyticsCard } from '../components/analytics/PredictiveAnalyticsCard';
 import { DocumentVersionManager } from '../components/documents/DocumentVersionManager';
 import { StatusBadge } from '../components/common/StatusBadge';
-import { ArrowLeft, MapPin, Building2, Calendar, FileText, Download, Landmark, Layers } from 'lucide-react';
+import { ArrowLeft, MapPin, Building2, Calendar, FileText, Download } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 
 export const ProjectDetails: React.FC = () => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquareWarning, Search, Filter, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { MessageSquareWarning, Search, Filter, MessageSquare } from 'lucide-react';
 import { StatusBadge } from '../components/common/StatusBadge';
 
 const MOCK_GRIEVANCES = [

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, MapPin, Search, Filter, FileCheck, Map, Image as ImageIcon } from 'lucide-react';
+import { Camera, MapPin, Search, Filter, FileCheck, Image as ImageIcon } from 'lucide-react';
 
 interface Verification {
   id: string;
