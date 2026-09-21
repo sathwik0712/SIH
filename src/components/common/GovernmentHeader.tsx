@@ -31,30 +31,22 @@ export const GovernmentHeader: React.FC<Props> = ({ children, onToggleMobileMenu
   return (
     <header className="w-full sticky top-0 z-40 shadow-md">
       {/* Top Gov Strip */}
-      <div className="bg-[#071E3D] text-slate-200 px-4 py-1 text-xs flex justify-between items-center border-b border-[#0f2d57]">
-        <div className="flex items-center space-x-3">
-          <span className="font-semibold text-amber-400 tracking-wide">भारत सरकार | GOVERNMENT OF INDIA</span>
-          <span className="hidden md:inline text-slate-500">|</span>
-          <span className="hidden md:inline text-slate-300">Department of Land Resources (MoRD)</span>
+      <div className="bg-[#071E3D] text-slate-200 px-4 py-1 text-xs flex justify-between items-center border-b border-[#0f2d57] overflow-hidden max-w-[100vw]">
+        <div className="flex items-center space-x-3 min-w-0">
+          <span className="font-semibold text-amber-400 tracking-wide truncate">भारत सरकार | GOVERNMENT OF INDIA</span>
+          <span className="hidden md:inline text-slate-500 shrink-0">|</span>
+          <span className="hidden md:inline text-slate-300 shrink-0">Department of Land Resources (MoRD)</span>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-1 text-slate-300">
+        <div className="flex items-center space-x-4 shrink-0">
+          <div className="hidden sm:flex items-center space-x-1 text-slate-300">
             <Globe className="w-3.5 h-3.5 text-slate-400" />
             <span className="text-[11px]">English / हिन्दी</span>
           </div>
-          <div className="flex items-center space-x-1 text-slate-300 text-[11px]">
-            <span className="cursor-pointer hover:text-white px-1">A-</span>
-            <span className="cursor-pointer hover:text-white px-1 font-semibold">A</span>
-            <span className="cursor-pointer hover:text-white px-1">A+</span>
-          </div>
-          <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-mono">
-            DEMO / PROTOTYPE
-          </span>
         </div>
       </div>
 
       {/* Main Header Bar (Deep Rich Navy #0B3559) */}
-      <div className="bg-[#0B3559] text-white px-4 py-2.5 flex justify-between items-center border-b border-[#082541]">
+      <div className="backdrop-blur-md bg-[#0B3559]/95 text-white px-4 py-2.5 flex justify-between items-center border-b border-[#082541]/80 overflow-hidden max-w-[100vw]">
         <div className="flex items-center space-x-3">
           {user && onToggleMobileMenu && (
             <button
@@ -90,7 +82,7 @@ export const GovernmentHeader: React.FC<Props> = ({ children, onToggleMobileMenu
 
         {/* User Info and Quick Actions */}
         {user ? (
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
             {children}
             <div className="hidden lg:flex items-center mx-2">
               <div className="relative">
@@ -130,11 +122,11 @@ export const GovernmentHeader: React.FC<Props> = ({ children, onToggleMobileMenu
             <button
               onClick={logout}
               id="header-logout-btn"
-              className="flex items-center space-x-1.5 bg-red-700 hover:bg-red-800 text-white px-3 py-1.5 rounded text-xs font-semibold border border-red-500 transition-colors shadow-sm"
+              className="flex items-center space-x-1.5 bg-red-700 hover:bg-red-800 text-white px-2 sm:px-3 py-1.5 rounded text-xs font-semibold border border-red-500 transition-colors shadow-sm shrink-0"
               title="Sign Out"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
+              <LogOut className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
         ) : (

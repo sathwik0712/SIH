@@ -85,7 +85,7 @@ export const GovernmentFooter: React.FC = () => {
         {/* Disclaimer */}
         <div className="py-3 border-b border-white/20 text-[11px] text-white/70">
           <p>
-            This is a prototype system built for demonstration purposes. Content, data and integrations shown here are illustrative and do not represent a live government system. Last Reviewed: 05 September 2026.
+            Content on this portal is published and managed by the Department of Land Resources, Ministry of Rural Development, Government of India. Last Reviewed: 05 September 2026.
           </p>
         </div>
 
