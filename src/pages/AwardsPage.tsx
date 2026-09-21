@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Award, FileText, Search, Filter, AlertCircle, Calendar } from 'lucide-react';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { apiFetch } from '../api/client';
+import { calculateTotalCompensation } from '../utils/compensationCalculator';
 
 interface AwardRecord {
   id: string;
@@ -10,19 +11,21 @@ interface AwardRecord {
   parcelId: string;
   ownerName: string;
   awardDate: string;
+  baseValueNumeric: number; // in INR
   baseValue: string;
   solatiumMultiplier: number;
+  yearsFromNotification: number;
   totalAward: string;
   objectionCount: number;
   status: 'DRAFT' | 'APPROVED' | 'DISPUTED' | 'DISBURSED';
 }
 
 const MOCK_AWARDS: AwardRecord[] = [
-  { id: 'AWD-001', lacNumber: 'LAC/2025/142', projectCode: 'NH65-HYD-PUN-01', parcelId: 'LP-PUN-001 (142/1A)', ownerName: 'Shri Tukaram S. Gaikwad', awardDate: '10 May 2025', baseValue: '₹74.25L', solatiumMultiplier: 2.0, totalAward: '₹1.48Cr', objectionCount: 0, status: 'APPROVED' },
-  { id: 'AWD-002', lacNumber: 'LAC/2025/143', projectCode: 'NH65-HYD-PUN-01', parcelId: 'LP-PUN-002 (142/1B)', ownerName: 'M/s Shinde Agro', awardDate: '12 May 2025', baseValue: '₹1.42Cr', solatiumMultiplier: 2.0, totalAward: '₹2.84Cr', objectionCount: 0, status: 'DISBURSED' },
-  { id: 'AWD-003', lacNumber: 'LAC/2025/144', projectCode: 'NH65-HYD-PUN-01', parcelId: 'LP-SOL-047 (104/3B)', ownerName: 'Smt. Rukmini B. Jadhav', awardDate: '-', baseValue: '₹77.50L', solatiumMultiplier: 2.0, totalAward: '₹1.55Cr', objectionCount: 2, status: 'DISPUTED' },
-  { id: 'AWD-004', lacNumber: 'LAC/2025/145', projectCode: 'DFCCIL-EDFC-04', parcelId: 'LP-VAR-012 (45/1)', ownerName: 'Ramesh Singh', awardDate: '15 May 2025', baseValue: '₹45.00L', solatiumMultiplier: 1.5, totalAward: '₹67.50L', objectionCount: 0, status: 'DRAFT' },
-  { id: 'AWD-005', lacNumber: 'LAC/2025/146', projectCode: 'SECI-SOLAR-TUM-01', parcelId: 'LP-TUM-088 (12/4)', ownerName: 'Anil Gowda', awardDate: '20 May 2025', baseValue: '₹12.00L', solatiumMultiplier: 1.0, totalAward: '₹12.00L', objectionCount: 1, status: 'APPROVED' },
+  { id: 'AWD-001', lacNumber: 'LAC/2025/142', projectCode: 'NH65-HYD-PUN-01', parcelId: 'LP-PUN-001 (142/1A)', ownerName: 'Shri Tukaram S. Gaikwad', awardDate: '10 May 2025', baseValueNumeric: 7425000, baseValue: '₹74.25L', solatiumMultiplier: 2.0, yearsFromNotification: 1.0, totalAward: '₹1.63Cr', objectionCount: 0, status: 'APPROVED' },
+  { id: 'AWD-002', lacNumber: 'LAC/2025/143', projectCode: 'NH65-HYD-PUN-01', parcelId: 'LP-PUN-002 (142/1B)', ownerName: 'M/s Shinde Agro', awardDate: '12 May 2025', baseValueNumeric: 14200000, baseValue: '₹1.42Cr', solatiumMultiplier: 2.0, yearsFromNotification: 1.0, totalAward: '₹3.12Cr', objectionCount: 0, status: 'DISBURSED' },
+  { id: 'AWD-003', lacNumber: 'LAC/2025/144', projectCode: 'NH65-HYD-PUN-01', parcelId: 'LP-SOL-047 (104/3B)', ownerName: 'Smt. Rukmini B. Jadhav', awardDate: '-', baseValueNumeric: 7750000, baseValue: '₹77.50L', solatiumMultiplier: 2.0, yearsFromNotification: 1.5, totalAward: '₹1.83Cr', objectionCount: 2, status: 'DISPUTED' },
+  { id: 'AWD-004', lacNumber: 'LAC/2025/145', projectCode: 'DFCCIL-EDFC-04', parcelId: 'LP-VAR-012 (45/1)', ownerName: 'Ramesh Singh', awardDate: '15 May 2025', baseValueNumeric: 4500000, baseValue: '₹45.00L', solatiumMultiplier: 1.5, yearsFromNotification: 1.0, totalAward: '₹1.48Cr', objectionCount: 0, status: 'DRAFT' },
+  { id: 'AWD-005', lacNumber: 'LAC/2025/146', projectCode: 'SECI-SOLAR-TUM-01', parcelId: 'LP-TUM-088 (12/4)', ownerName: 'Anil Gowda', awardDate: '20 May 2025', baseValueNumeric: 1200000, baseValue: '₹12.00L', solatiumMultiplier: 1.0, yearsFromNotification: 0.5, totalAward: '₹25.20L', objectionCount: 1, status: 'APPROVED' },
 ];
 
 export const AwardsPage: React.FC = () => {
@@ -111,40 +114,48 @@ export const AwardsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filtered.map(a => (
-                <tr key={a.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="px-3.5 py-2.5">
-                    <div className="font-mono font-bold text-[#0B3559]">{a.lacNumber}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
-                      <Calendar className="w-3 h-3" /> {a.awardDate}
-                    </div>
-                  </td>
-                  <td className="px-3.5 py-2.5">
-                    <div className="font-semibold text-slate-800">{a.parcelId}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{a.projectCode}</div>
-                  </td>
-                  <td className="px-3.5 py-2.5 text-slate-700 font-medium">
-                    {a.ownerName}
-                    {a.objectionCount > 0 && (
-                      <div className="text-[10px] text-red-600 font-semibold mt-0.5 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" /> {a.objectionCount} Objections
+              {filtered.map(a => {
+                const breakdown = calculateTotalCompensation({
+                  baseMarketValue: a.baseValueNumeric,
+                  ruralMultiplier: a.solatiumMultiplier,
+                  yearsFromNotification: a.yearsFromNotification
+                });
+                const formattedAward = (breakdown.totalCompensation / 10000000).toFixed(2) + 'Cr';
+                return (
+                  <tr key={a.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="px-3.5 py-2.5">
+                      <div className="font-mono font-bold text-[#0B3559]">{a.lacNumber}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" /> {a.awardDate}
                       </div>
-                    )}
-                  </td>
-                  <td className="px-3.5 py-2.5 font-mono text-slate-700">{a.baseValue}</td>
-                  <td className="px-3.5 py-2.5 font-mono text-slate-600">{a.solatiumMultiplier}x</td>
-                  <td className="px-3.5 py-2.5 font-mono font-bold text-emerald-700">{a.totalAward}</td>
-                  <td className="px-3.5 py-2.5">
-                    <StatusBadge status={a.status} />
-                  </td>
-                  <td className="px-3.5 py-2.5 text-right">
-                    <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 ml-auto border border-slate-300 text-slate-700 rounded hover:bg-slate-100 transition-colors font-semibold text-[11px]">
-                      <FileText className="w-3.5 h-3.5" />
-                      View Order
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-3.5 py-2.5">
+                      <div className="font-semibold text-slate-800">{a.parcelId}</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">{a.projectCode}</div>
+                    </td>
+                    <td className="px-3.5 py-2.5 text-slate-700 font-medium">
+                      {a.ownerName}
+                      {a.objectionCount > 0 && (
+                        <div className="text-[10px] text-red-600 font-semibold mt-0.5 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> {a.objectionCount} Objections
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3.5 py-2.5 font-mono text-slate-700">{a.baseValue}</td>
+                    <td className="px-3.5 py-2.5 font-mono text-slate-600">{a.solatiumMultiplier}x (₹{(breakdown.solatium / 100000).toFixed(1)}L)</td>
+                    <td className="px-3.5 py-2.5 font-mono font-bold text-emerald-700">₹{formattedAward}</td>
+                    <td className="px-3.5 py-2.5">
+                      <StatusBadge status={a.status} />
+                    </td>
+                    <td className="px-3.5 py-2.5 text-right">
+                      <button className="flex items-center justify-center gap-1.5 px-3 py-1.5 ml-auto border border-slate-300 text-slate-700 rounded hover:bg-slate-100 transition-colors font-semibold text-[11px]">
+                        <FileText className="w-3.5 h-3.5" />
+                        View Order
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
